@@ -43,7 +43,7 @@ public class BookDAO {
         }
         return books;
     }
-    public void updateBook(Book book){
+    public int updateBook(Book book){
         String query = "UPDATE books SET title=?,author=?,quantity=? WHERE id=?";
         try(Connection conn=DBConnection.getConnection();
         PreparedStatement ps = conn.prepareStatement(query)){
@@ -51,16 +51,34 @@ public class BookDAO {
             ps.setString(2,book.getAuthor());
             ps.setInt(3,book.getQuantity());
             ps.setInt(4,book.getId());
-            int rows=ps.executeUpdate();
-            if(rows>0){
-                System.out.println("✅ Book Updated Successfully!");
-            }else{
-                System.out.println("⚠️ Book not found.");
-            }
+            return ps.executeUpdate();
         }catch(SQLException e){
             System.out.println("❌Error Updating Book: "+e.getMessage());
         }
-        
+        return 0;
+    }
+
+    public Book getBookById(int id){
+        String query = "SELECT * FROM books WHERE id=?";
+        try(Connection conn = DBConnection.getConnection();
+        PreparedStatement ps = conn.prepareStatement(query)){
+            ps.setInt(1,id);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                Book book = new Book();
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
+                book.setQuantity(rs.getInt("quantity"));
+                return book;
+            }else{
+                return null;
+            }
+
+        }catch (SQLException e){
+            System.out.println("❌ Error Fetching Book: "+e.getMessage());
+        }
+        return null;
     }
 
     public void deleteBook(int id){
