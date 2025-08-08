@@ -10,19 +10,25 @@ public class AuthService {
     private final Scanner scanner = new Scanner(System.in);
 
     public User login(){
-        System.out.print("Username: ");
-        String username = scanner.nextLine().trim();
+        int attempt = 0;
+        final int MAX_ATTEMPT =5;
+        while(attempt<MAX_ATTEMPT){
+            System.out.print("Username: ");
+            String username = scanner.nextLine().trim();
 
-        System.out.print("Password: ");
-        String password = scanner.nextLine().trim();
+            System.out.print("Password: ");
+            String password = scanner.nextLine().trim();
 
-        User user = userDAO.getUserByUsername(username);
-        if(user!=null && user.getPassword().equals(password)){
-            System.out.println("✅ Login successful. Welcome, "+user.getUsername());
-            return user;
-        }else{
-            System.out.println("❌ Invalid credentials.");
-            return null;
+            User user = userDAO.getUserByUsername(username);
+            if(user!=null && user.getPassword().equals(password)){
+                System.out.println("✅ Login successful. Welcome, "+user.getUsername());
+                return user;
+            }
+                attempt++;
+                System.out.println("❌ Invalid Credentials.Attempts left: "+(MAX_ATTEMPT-attempt));
+
         }
+        System.out.println("🚫 Too many failed login attempts. Exiting...");
+        return null;
     }
 }
